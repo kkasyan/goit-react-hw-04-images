@@ -3,90 +3,101 @@ import { useState, useEffect } from 'react';
 
 import { ImageGalleryItem } from 'components/ImageGalleryItem/ImageGalleryItem';
 import { SearchLoad } from './SearchLoad/SearchLoad';
-import { Wrap } from 'components/Loader/Wrap';
+import { Loader } from 'components/Loader/Loader';
 import { Modal } from 'components/Modal/Modal';
 
 import { getPhotos } from 'api/api';
 
 import PropTypes from 'prop-types';
+import * as Scroll from 'react-scroll';
 
-// import { initialState } from './initialState';
-// import { smoothScroll } from 'helpers/smoothScroll';
+const scroll = Scroll.animateScroll;
 
 export const ImageGallery = ({ imageName }) => {
   // const [state, setState] = useState(...initialState);
   const [page, setPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(0);
   const [totalHits, setTotalHits] = useState(null);
   const [photos, setPhotos] = useState([]);
   // const [error, setError] = useState(null);
   const [status, setStatus] = useState('idle');
   const [modalOpen, setModalOpen] = useState(false);
   const [modalImage, setModalImage] = useState(null);
+  const [query, setQuery] = useState('');
+  const [loading, setLoading] = useState(false);
 
   const loadMore = () => {
-    setPage({ page: page + 1 });
+    setPage(prevPage => prevPage + 1);
   };
 
   const toggleModal = () => {
-    setModalOpen({ modalOpen: !modalOpen });
+    setModalOpen(!modalOpen);
   };
 
   const closeModal = () => {
-    setModalOpen({ modalOpen: false });
-    setModalImage({ modalImage: null });
+    setModalOpen(false);
+    setModalImage(null);
   };
 
-  const reset = () => {
-    setPage({ page: 1 });
-    setTotalHits({ totalHits: null });
-    setPhotos({ photos: [] });
-    setModalOpen({ modalOpen: false });
-  };
+  // const reset = () => {
+  //   setPage({ page: 1 });
+  //   setTotalHits({ totalHits: null });
+  //   setPhotos({ photos: [] });
+  //   setModalOpen({ modalOpen: false });
+  // };
 
   const getImage = imageURL => {
-    setModalImage({
-      modalImage: imageURL,
-    });
-    toggleModal();
+    setModalImage(imageURL);
   };
 
   // const totalPages = Math.ceil(state.totalHits / 12);
 
   useEffect(() => {
-    async function fetchImage(imageName) {
-      // if (!imageName) {
-      //   return;
-      // }
+    setQuery(imageName);
+    setPage(1);
+    setPhotos([]);
+  }, [imageName]);
 
+  useEffect(() => {
+    const fetchImage = async () => {
+      if (query === '' || imageName === '') {
+        return;
+      }
+      setLoading(true);
       // reset();
-      // setStatus({
-      //   status: 'pending',
-      // });
-
+      // setLoading(!loading);
       try {
-        const newPhotos = await getPhotos(imageName, page);
-
+        // setStatus('pending');
+        // setLoading(true);
+        const newPhotos = await getPhotos(query, page);
+        // setLoading(!loading);
+        // setLoading(actual => !actual);
         if (newPhotos.totalHits === 0 || newPhotos.totalHits === null) {
-          return setStatus({ status: 'rejected' });
+          setLoading(false);
+          setLoading(!loading);
+          return;
         }
 
-        setStatus({
-          status: 'resolved',
-        });
+        setStatus('resolved');
+        // setLoading(false);
+        // setLoading(!loading);
         setTotalHits({ totalHits: newPhotos.totalHits });
-        setPhotos({ photos: [...photos, ...newPhotos.hits] });
-        setTotalPages({ totalPages: totalPages });
-        // () => {
-        //   smoothScroll();
-        // }
-      } catch (error) {
-        setStatus({ status: 'rejected' });
-      }
-    }
+        setPhotos(prev => [...prev, ...newPhotos.hits]);
 
-    fetchImage();
-  }, [imageName]);
+        if (page !== 1) {
+          scroll.scrollToBottom();
+        }
+      } catch (error) {
+        setStatus('rejected');
+        console.log(error);
+      } finally {
+        // setLoading(!loading);
+        setLoading(false);
+      }
+    };
+    if (query) {
+      fetchImage();
+    }
+  }, [page, query]);
 
   if (status === 'idle') {
     return (
@@ -96,11 +107,11 @@ export const ImageGallery = ({ imageName }) => {
     );
   }
 
-  if (status === 'pending') {
-    return <Wrap />;
-  }
+  // if (status === 'pending') {
+  //   return <Loader />;
+  // }
 
-  if (status === 'resolved') {
+  if (photos.length > 0) {
     return (
       <>
         <ul className={css.gallery}>
@@ -115,9 +126,14 @@ export const ImageGallery = ({ imageName }) => {
             );
           })}
         </ul>
-        {totalPages > page && (
+        {/* {loading && <Wrap />} */}
+        {/* {photos.length > 11 && (
+          <SearchLoad loadMore={loadMore} text="Load more" />
+        )} */}
+        {photos.length > 11 && (
           <SearchLoad loadMore={loadMore} text="Load more" />
         )}
+        {loading && <Loader />}
         {modalImage !== null && (
           <Modal
             image={modalImage}
@@ -139,7 +155,7 @@ export const ImageGallery = ({ imageName }) => {
 };
 
 ImageGallery.propTypes = {
-  // imageName: PropTypes.object.isRequired,
+  imageName: PropTypes.string.isRequired,
   id: PropTypes.number,
   closeModal: PropTypes.func,
   toggleModal: PropTypes.func,

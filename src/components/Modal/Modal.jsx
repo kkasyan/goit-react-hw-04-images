@@ -1,9 +1,9 @@
 import { useEffect } from 'react';
-import { createPortal } from 'react-dom';
+// import { createPortal } from 'react-dom';
 
 import css from './modal.module.css';
 
-const modalRoot = document.querySelector('#modal-root');
+// const modalRoot = document.getElementById('modal-root');
 
 export const Modal = ({ image, closeModal }) => {
   const handleBackdropClick = e => {
@@ -27,13 +27,12 @@ export const Modal = ({ image, closeModal }) => {
     };
   }, [closeModal]);
 
-  return createPortal(
+  return (
     <div className={css.overlay} onClick={handleBackdropClick}>
       <div className={css.modal}>
         <img className={css.modalImage} src={image} alt="" />
       </div>
-    </div>,
-    modalRoot
+    </div>
   );
 };
 

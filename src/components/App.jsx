@@ -11,8 +11,8 @@ import PropTypes from 'prop-types';
 export const App = () => {
   const [imageName, setImageName] = useState('');
 
-  const handleFormSubmit = imageName => {
-    setImageName({ imageName });
+  const handleFormSubmit = newImageName => {
+    setImageName(newImageName);
   };
 
   return (

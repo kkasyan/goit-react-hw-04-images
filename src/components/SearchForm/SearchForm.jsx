@@ -26,6 +26,7 @@ export const SearchForm = ({ onSubmit }) => {
     setImageName({
       imageName: '',
     });
+    e.target.reset();
   };
 
   return (
