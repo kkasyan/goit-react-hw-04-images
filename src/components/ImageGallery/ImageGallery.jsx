@@ -83,7 +83,7 @@ export const ImageGallery = ({ imageName }) => {
     if (query) {
       fetchImage();
     }
-  }, [page, query]);
+  }, [page, query, imageName]);
 
   if (status === 'idle') {
     return (
@@ -93,7 +93,7 @@ export const ImageGallery = ({ imageName }) => {
     );
   }
 
-  if (photos.length > 0) {
+  if (photos.length > 0 || totalHits > 0) {
     return (
       <>
         <ul className={css.gallery}>
