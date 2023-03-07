@@ -28,31 +28,3 @@ App.propTypes = {
   handleFormSubmit: PropTypes.func,
   imageName: PropTypes.string,
 };
-
-// export class App extends Component {
-//   state = {
-//     imageName: '',
-//   };
-
-//   static propTypes = {
-//     handleFormSubmit: PropTypes.func,
-//     imageName: PropTypes.string,
-//   };
-
-//   handleFormSubmit = imageName => {
-//     this.setState({ imageName });
-//   };
-
-//   render() {
-//     const { imageName } = this.state;
-//     const { handleFormSubmit } = this;
-
-//     return (
-//       <div className={css.app}>
-//         <Searchbar onSubmit={handleFormSubmit} />
-//         <ImageGallery imageName={imageName} />
-//         <ToastContainer />
-//       </div>
-//     );
-//   }
-// }

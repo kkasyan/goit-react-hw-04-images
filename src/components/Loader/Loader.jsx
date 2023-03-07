@@ -1,4 +1,3 @@
-// import css from './loader.module.css';
 import { Circles } from 'react-loader-spinner';
 
 export const Loader = () => {
