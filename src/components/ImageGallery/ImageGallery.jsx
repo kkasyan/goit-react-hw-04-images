@@ -1,5 +1,5 @@
 import css from './imageGallery.module.css';
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 
 import { ImageGalleryItem } from 'components/ImageGalleryItem/ImageGalleryItem';
 import { SearchLoad } from './SearchLoad/SearchLoad';
@@ -23,6 +23,16 @@ export const ImageGallery = ({ imageName }) => {
   const [query, setQuery] = useState('');
   const [loading, setLoading] = useState(false);
 
+  // const firstRender = useRef(true);
+  // const prevPage = useRef(1);
+  // const prevSearch = useRef('');
+
+  useEffect(() => {
+    setQuery(imageName);
+    setPage(1);
+    setPhotos([]);
+  }, [imageName, query]);
+
   const loadMore = () => {
     setPage(prevPage => prevPage + 1);
   };
@@ -40,24 +50,23 @@ export const ImageGallery = ({ imageName }) => {
     setModalImage(imageURL);
   };
 
-  useEffect(() => {
-    setQuery(imageName);
-    setPage(1);
-    setPhotos([]);
-  }, [imageName]);
+  // useEffect(() => {
+  //   prevPage.current = page;
+  //   prevSearch.current = imageName;
+  // });
 
-  const firstRender = useRef(true);
+  // useEffect(() => {
+  //   // if (firstRender.current) {
+  //   //   firstRender.current = false;
+  //   //   return;
+  //   // }
 
   useEffect(() => {
-    if (firstRender.current) {
-      firstRender.current = false;
+    if (query === '') {
       return;
     }
 
     const fetchImage = async () => {
-      if (query === '' || imageName === '') {
-        return;
-      }
       setLoading(true);
       try {
         setStatus('pending');
@@ -83,7 +92,7 @@ export const ImageGallery = ({ imageName }) => {
     if (query) {
       fetchImage();
     }
-  }, [page, query, imageName]);
+  }, [page, query]);
 
   if (status === 'idle') {
     return (
